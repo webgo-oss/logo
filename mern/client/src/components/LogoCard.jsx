@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DownloadButtons from './DownloadButtons.jsx';
 
 // "light" = beige stage (for green logos), "dark" = green stage (for white logos)
 export default function LogoCard({ logo, stage }) {
@@ -21,13 +22,11 @@ export default function LogoCard({ logo, stage }) {
         <div>
           <h4>{logo.name}</h4>
           <p>
-            PNG · transparent · {logo.width} × {logo.height}
+            PNG · JPG · TIFF · {logo.width} × {logo.height}
             {logo.downloads > 0 && ` · ${logo.downloads} download${logo.downloads === 1 ? '' : 's'}`}
           </p>
         </div>
-        <a className="dl" href={logo.downloadUrl} download>
-          Download
-        </a>
+        <DownloadButtons logo={logo} />
       </div>
     </article>
   );

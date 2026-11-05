@@ -7,7 +7,7 @@ body{font-family:Montserrat,system-ui,sans-serif;background:var(--bg);color:var(
 code{background:var(--beige);padding:2px 6px;border-radius:4px}
 
 header.hero{background:var(--green);color:#fff;padding:28px 0 84px;position:relative;overflow:hidden}
-header.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;border:1px solid rgba(212,177,98,.35)}
+header.hero::after{content:"";pointer-events:none;position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;border:1px solid rgba(212,177,98,.35)}
 nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:72px}
 nav img{height:44px}
 nav .links{display:flex;gap:22px;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
@@ -54,3 +54,73 @@ footer{background:var(--green-d);color:#a9bdb4;padding:28px 0;font-size:13px;tex
 @media(max-width:760px){nav .links{display:none}.brandmark{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
 .stage img{display:block;width:auto;height:auto}
 .img-error{font-size:12px;color:#b00020;text-align:center;background:#fff;padding:10px;border-radius:8px}
+
+.dl-group{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.dl-group .dl{padding:8px 14px;font-size:12px;letter-spacing:.04em}
+.dl-group .dl-jpg{background:var(--green-d)}
+.dl-group .dl-tiff{background:var(--gold)}
+.dl-group .dl-tiff:hover,.dl-group .dl-jpg:hover,.dl-group .dl-png:hover{background:var(--gold-l);color:var(--green-d)}
+.brandmark .info .dl-group{justify-content:flex-start}
+
+/* ---------- account bar ---------- */
+.nav-right{display:flex;align-items:center;gap:28px}
+.account{display:flex;align-items:center;gap:14px;font-size:13px}
+.account .who{color:#cfdcd5;font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.linkbtn{background:none;border:1px solid rgba(255,255,255,.35);color:#fff;font:inherit;font-size:12px;letter-spacing:.06em;padding:6px 14px;border-radius:999px;cursor:pointer;transition:.2s}
+.linkbtn:hover{background:var(--gold);border-color:var(--gold)}
+header.hero.slim{padding:28px 0 56px}
+.brandtext{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:20px;letter-spacing:.02em}
+@media(max-width:760px){.account .who{display:none}.nav-right{gap:12px}}
+
+/* ---------- sign-in ---------- */
+.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--green);position:relative;overflow:hidden}
+.auth-page::before,.auth-page::after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(212,177,98,.3);pointer-events:none}
+.auth-page::before{width:520px;height:520px;right:-160px;top:-160px}
+.auth-page::after{width:380px;height:380px;left:-120px;bottom:-140px}
+.auth-card{position:relative;z-index:1;width:100%;max-width:420px;background:#fff;border-radius:18px;padding:38px 34px;box-shadow:0 30px 70px rgba(0,0,0,.3);display:flex;flex-direction:column;gap:16px}
+.auth-card .eyebrow{color:var(--gold)}
+.auth-card h1{font-size:32px;margin:0;color:var(--green)}
+.auth-sub{color:var(--muted);font-size:14px;margin-bottom:6px}
+.field{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.field em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:400}
+.field input{font:inherit;font-size:15px;letter-spacing:0;text-transform:none;font-weight:500;color:var(--ink);padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);outline:none;transition:.15s}
+.field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(174,135,58,.18);background:#fff}
+.field input.code-input{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;font-size:17px}
+.btn{background:var(--green);color:#fff;border:0;font:inherit;font-size:14px;font-weight:600;padding:13px 22px;border-radius:999px;cursor:pointer;transition:background .2s}
+.btn:hover:not(:disabled){background:var(--gold)}
+.btn:disabled{opacity:.6;cursor:default}
+.btn.small{padding:8px 14px;font-size:12px}
+.btn.ghost{background:transparent;color:var(--green);border:1px solid var(--line)}
+.btn.ghost:hover:not(:disabled){background:var(--beige);color:var(--green)}
+.btn.danger{background:transparent;color:#b00020;border:1px solid rgba(176,0,32,.3)}
+.btn.danger:hover:not(:disabled){background:#b00020;color:#fff}
+.form-error{background:#fdecee;color:#b00020;border:1px solid rgba(176,0,32,.25);padding:10px 14px;border-radius:10px;font-size:13px}
+.auth-switch{text-align:center;font-size:13px}
+.auth-switch a{color:var(--muted);text-decoration:none}
+.auth-switch a:hover{color:var(--gold)}
+
+/* ---------- admin panel ---------- */
+main.admin{padding:0 24px 72px;margin-top:-28px;position:relative}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin-bottom:22px;box-shadow:0 10px 30px rgba(7,67,51,.06)}
+.panel h2{font-size:24px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.count{font-family:Montserrat,sans-serif;font-size:12px;font-weight:600;background:var(--beige);color:var(--green);border-radius:999px;padding:3px 10px}
+.add-form{display:grid;grid-template-columns:1fr 1fr auto;gap:14px;align-items:end}
+@media(max-width:760px){.add-form{grid-template-columns:1fr}}
+.reveal{margin-top:20px;background:var(--beige);border:1px solid var(--gold-l);border-radius:12px;padding:16px 18px;font-size:14px;display:flex;flex-direction:column;gap:12px}
+.reveal-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.reveal-code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:24px;letter-spacing:.16em;font-weight:600;background:#fff;color:var(--green);padding:8px 16px;border-radius:10px;border:1px dashed var(--gold)}
+.panel .form-error{margin-top:16px}
+.muted{color:var(--muted)}.small{font-size:12px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:0 12px 10px;border-bottom:1px solid var(--line)}
+td{padding:14px 12px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.u-email{font-weight:600}
+.badge{font-size:11px;font-weight:600;letter-spacing:.06em;padding:4px 10px;border-radius:999px}
+.badge.on{background:#e3f3ea;color:#116b3c}.badge.off{background:#f1e6e6;color:#8c2b2b}
+td.actions{text-align:right}
+td.actions .btn{margin-left:6px}
+
+/* keep header content (Sign out, Admin panel, links) above the decorative circle */
+header.hero .wrap{position:relative;z-index:1}

@@ -1,10 +1,18 @@
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
 const Logo = require('../models/Logo');
 
 const router = express.Router();
 const ORIGINALS = path.join(__dirname, '..', 'public', 'logos', 'original');
 const PREVIEW_DIR = path.join(__dirname, '..', 'public', 'logos', 'preview');
+
+// One entry per downloadable format. `file` builds the filename from the logo code.
+const FORMATS = {
+  png: { dir: ORIGINALS, file: (c) => `unstoppable-logo-${c}.png`, label: 'PNG' },
+  jpg: { dir: path.join(__dirname, '..', 'public', 'jpg'), file: (c) => `Unstoppable Logos-${c}.jpg`, label: 'JPG' },
+  tiff: { dir: path.join(__dirname, '..', 'public', 'tiff'), file: (c) => `Unstoppable Logos-${c}.tiff`, label: 'TIFF' },
+};
 
 const toDto = (l) => ({
   code: l.code,
@@ -16,7 +24,13 @@ const toDto = (l) => ({
   subtype: l.subtype,
   // Served straight from disk by express.static (no DB lookup, so it can't go stale)
   previewUrl: `/assets/logos/preview/logo-${l.code}.png`,
-  downloadUrl: `/api/logos/${l.code}/download`,
+  downloadUrl: `/api/logos/${l.code}/download?format=png`, // kept for backwards compatibility
+  // Separate download link for each file format
+  downloadUrls: {
+    png: `/api/logos/${l.code}/download?format=png`,
+    jpg: `/api/logos/${l.code}/download?format=jpg`,
+    tiff: `/api/logos/${l.code}/download?format=tiff`,
+  },
   width: l.width,
   height: l.height,
   downloads: l.downloads,
@@ -59,7 +73,7 @@ router.get('/:code/preview', async (req, res, next) => {
   try {
     const logo = await Logo.findOne({ code: req.params.code }).lean();
     if (!logo) return res.status(404).json({ message: 'Logo not found' });
-    res.set('Cache-Control', 'public, max-age=86400');
+    res.set('Cache-Control', 'private, max-age=86400');
     // Build the filename from the code (not from stored DB data) and use `root`
     // so Express never rejects the path.
     const file = `logo-${path.basename(logo.code)}.png`;
@@ -71,17 +85,24 @@ router.get('/:code/preview', async (req, res, next) => {
   }
 });
 
-// GET /api/logos/:code/download  -> sends the original PNG and counts the download
+// GET /api/logos/:code/download?format=png|jpg|tiff  -> sends that file and counts the download
 router.get('/:code/download', async (req, res, next) => {
   try {
-    const logo = await Logo.findOneAndUpdate(
-      { code: req.params.code },
-      { $inc: { downloads: 1 } },
-      { new: true }
-    );
+    let format = String(req.query.format || 'png').toLowerCase();
+    if (format === 'jpeg') format = 'jpg';
+    if (format === 'tif') format = 'tiff';
+    const fmt = FORMATS[format];
+    if (!fmt) return res.status(400).json({ message: 'Unknown format. Use png, jpg or tiff.' });
+
+    const code = path.basename(req.params.code);
+    const filePath = path.join(fmt.dir, fmt.file(code));
+    if (!fs.existsSync(filePath)) return res.status(404).json({ message: 'File not found', file: fmt.file(code) });
+
+    const logo = await Logo.findOneAndUpdate({ code }, { $inc: { downloads: 1 } }, { new: true });
     if (!logo) return res.status(404).json({ message: 'Logo not found' });
-    const file = `unstoppable-logo-${path.basename(logo.code)}.png`;
-    res.download(path.join(ORIGINALS, file), file);
+
+    // Friendly filename, e.g. unstoppable-logo-04.jpg
+    res.download(filePath, `unstoppable-logo-${code}.${format}`);
   } catch (err) {
     next(err);
   }
