@@ -8,6 +8,8 @@ const { requireAuth } = require('./middleware/auth');
 
 const app = express();
 app.disable('x-powered-by');
+// Render (and most hosts) sit behind a proxy: trust it so req.ip is the visitor's real address
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '10kb' }));
 
 // Preview images are only served to signed-in people. The full-size files (png / jpg / tiff)

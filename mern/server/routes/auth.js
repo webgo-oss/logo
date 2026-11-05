@@ -2,7 +2,7 @@ const express = require('express');
 const User = require('../models/User');
 const { requireAuth } = require('../middleware/auth');
 const { createLimiter } = require('../utils/rateLimit');
-const { hashSecret, verifySecret, normalizeCode, startSession, endSession } = require('../utils/auth');
+const { hashSecret, verifySecret, startSession, endSession } = require('../utils/auth');
 
 const router = express.Router();
 const limiter = createLimiter({ max: 5, windowMs: 15 * 60 * 1000 });
@@ -39,7 +39,8 @@ async function login(req, res, next, { role, field, label }) {
       return res.status(429).json({ message: `Too many attempts. Try again in ${Math.ceil(wait / 60)} minute(s).` });
     }
 
-    const secret = role === 'user' ? normalizeCode(raw) : String(raw);
+    // The code is exactly what the admin typed (leading/trailing spaces ignored)
+    const secret = role === 'user' ? String(raw).trim() : String(raw);
     const user = await User.findOne({ email, role });
     let ok = false;
     if (user) ok = await verifySecret(secret, user.secretHash);

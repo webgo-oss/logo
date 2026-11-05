@@ -1,7 +1,7 @@
 const express = require('express');
 const User = require('../models/User');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
-const { hashSecret, generateCode, codeForHashing } = require('../utils/auth');
+const { hashSecret, validateCode } = require('../utils/auth');
 const { toDto } = require('./auth');
 
 const router = express.Router();
@@ -29,38 +29,37 @@ router.get('/users', async (_req, res, next) => {
   }
 });
 
-// POST /api/admin/users  { email, name? }  -> creates the user and returns their access code (shown once)
+// POST /api/admin/users  { email, name?, code }  -> creates the user with the access code the admin chose
 router.post('/users', async (req, res, next) => {
   try {
     const email = String((req.body && req.body.email) || '').trim().toLowerCase();
     const name = String((req.body && req.body.name) || '').trim().slice(0, 80);
+    const code = String((req.body && req.body.code) || '').trim();
     if (!EMAIL_RE.test(email)) return res.status(400).json({ message: 'Please enter a valid email address' });
+    const codeError = validateCode(code);
+    if (codeError) return res.status(400).json({ message: codeError });
     if (await User.findOne({ email })) return res.status(409).json({ message: 'That email already has an account' });
 
-    const code = generateCode();
-    const user = await User.create({
-      email,
-      name,
-      role: 'user',
-      secretHash: await hashSecret(codeForHashing(code)),
-    });
-    res.status(201).json({ user: toDto(user), code });
+    const user = await User.create({ email, name, role: 'user', secretHash: await hashSecret(code) });
+    res.status(201).json({ user: toDto(user) });
   } catch (err) {
     if (err && err.code === 11000) return res.status(409).json({ message: 'That email already has an account' });
     next(err);
   }
 });
 
-// POST /api/admin/users/:id/code  -> new access code (old one stops working, active sessions end)
+// POST /api/admin/users/:id/code  { code }  -> set a new access code (old one stops working, user is signed out)
 router.post('/users/:id/code', async (req, res, next) => {
   try {
     const user = await findUser(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-    const code = generateCode();
-    user.secretHash = await hashSecret(codeForHashing(code));
+    const code = String((req.body && req.body.code) || '').trim();
+    const codeError = validateCode(code);
+    if (codeError) return res.status(400).json({ message: codeError });
+    user.secretHash = await hashSecret(code);
     user.sessionVersion = (user.sessionVersion || 0) + 1;
     await user.save();
-    res.json({ user: toDto(user), code });
+    res.json({ user: toDto(user) });
   } catch (err) {
     next(err);
   }

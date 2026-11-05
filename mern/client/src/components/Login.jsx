@@ -54,15 +54,14 @@ export default function Login({ mode, onSuccess, navigate }) {
         <label className="field">
           <span>{isAdmin ? 'Password' : 'Access code'}</span>
           <input
-            type={isAdmin ? 'password' : 'text'}
-            className={isAdmin ? '' : 'code-input'}
-            autoComplete={isAdmin ? 'current-password' : 'off'}
-            autoCapitalize={isAdmin ? 'none' : 'characters'}
+            type="password"
+            autoComplete="current-password"
+            autoCapitalize="none"
             spellCheck="false"
             required
             value={secret}
             onChange={(e) => setSecret(e.target.value)}
-            placeholder={isAdmin ? '••••••••' : 'XXXXX-XXXXX'}
+            placeholder="••••••••"
           />
         </label>
 

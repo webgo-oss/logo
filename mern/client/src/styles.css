@@ -104,8 +104,9 @@ main.admin{padding:0 24px 72px;margin-top:-28px;position:relative}
 .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin-bottom:22px;box-shadow:0 10px 30px rgba(7,67,51,.06)}
 .panel h2{font-size:24px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
 .count{font-family:Montserrat,sans-serif;font-size:12px;font-weight:600;background:var(--beige);color:var(--green);border-radius:999px;padding:3px 10px}
-.add-form{display:grid;grid-template-columns:1fr 1fr auto;gap:14px;align-items:end}
-@media(max-width:760px){.add-form{grid-template-columns:1fr}}
+.add-form{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:14px;align-items:end}
+@media(max-width:900px){.add-form{grid-template-columns:1fr 1fr}.add-form .btn{grid-column:1/-1}}
+@media(max-width:560px){.add-form{grid-template-columns:1fr}}
 .reveal{margin-top:20px;background:var(--beige);border:1px solid var(--gold-l);border-radius:12px;padding:16px 18px;font-size:14px;display:flex;flex-direction:column;gap:12px}
 .reveal-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .reveal-code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:24px;letter-spacing:.16em;font-weight:600;background:#fff;color:var(--green);padding:8px 16px;border-radius:10px;border:1px dashed var(--gold)}

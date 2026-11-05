@@ -28,21 +28,17 @@ async function verifySecret(secret, stored) {
   return crypto.timingSafeEqual(actual, expected);
 }
 
-/* ---------- access codes ---------- */
-// No 0/O/1/I/L so codes are easy to read out and type
-const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+/* ---------- access codes (chosen by the admin) ---------- */
+const CODE_MIN = 6;
+const CODE_MAX = 64;
 
-function generateCode() {
-  let raw = '';
-  for (let i = 0; i < 10; i++) raw += ALPHABET[crypto.randomInt(ALPHABET.length)];
-  return `${raw.slice(0, 5)}-${raw.slice(5)}`; // e.g. 7KQ2M-X9PDA
+// Returns an error message, or null if the code is acceptable
+function validateCode(code) {
+  const c = String(code == null ? '' : code).trim();
+  if (c.length < CODE_MIN) return `The access code must be at least ${CODE_MIN} characters`;
+  if (c.length > CODE_MAX) return `The access code must be at most ${CODE_MAX} characters`;
+  return null;
 }
-
-// Accepts "7kq2m-x9pda", "7KQ2M X9PDA", etc.
-const normalizeCode = (code) => String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-
-// Codes are stored and compared in their normalized form (no dash)
-const codeForHashing = (code) => normalizeCode(code);
 
 /* ---------- signed session tokens (HMAC-SHA256) ---------- */
 const sign = (body) => crypto.createHmac('sha256', SECRET).update(body).digest('base64url');
@@ -110,9 +106,7 @@ module.exports = {
   COOKIE_NAME,
   hashSecret,
   verifySecret,
-  generateCode,
-  normalizeCode,
-  codeForHashing,
+  validateCode,
   verifyToken,
   parseCookies,
   startSession,

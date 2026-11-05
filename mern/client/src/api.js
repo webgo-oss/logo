@@ -38,7 +38,7 @@ export const logout = () => request('/api/auth/logout', { method: 'POST' });
 
 // Admin
 export const listUsers = () => request('/api/admin/users');
-export const createUser = (email, name) => request('/api/admin/users', { method: 'POST', body: { email, name } });
-export const regenerateCode = (id) => request(`/api/admin/users/${id}/code`, { method: 'POST' });
+export const createUser = (email, name, code) => request('/api/admin/users', { method: 'POST', body: { email, name, code } });
+export const setUserCode = (id, code) => request(`/api/admin/users/${id}/code`, { method: 'POST', body: { code } });
 export const setUserActive = (id, active) => request(`/api/admin/users/${id}`, { method: 'PATCH', body: { active } });
 export const deleteUser = (id) => request(`/api/admin/users/${id}`, { method: 'DELETE' });

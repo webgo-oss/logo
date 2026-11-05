@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { listUsers, createUser, regenerateCode, setUserActive, deleteUser } from '../api.js';
+import { listUsers, createUser, setUserCode, setUserActive, deleteUser } from '../api.js';
 
 const fmt = (d) => (d ? new Date(d).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : '—');
 
@@ -8,6 +8,7 @@ export default function AdminPanel({ session, navigate, onLogout, onExpired }) {
   const [error, setError] = useState('');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
+  const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [reveal, setReveal] = useState(null); // { email, code, kind }
   const [copied, setCopied] = useState(false);
@@ -35,11 +36,12 @@ export default function AdminPanel({ session, navigate, onLogout, onExpired }) {
     setBusy(true);
     setError('');
     try {
-      const { user, code } = await createUser(email, name);
+      const { user } = await createUser(email, name, code);
       setReveal({ email: user.email, code, kind: 'created' });
       setCopied(false);
       setEmail('');
       setName('');
+      setCode('');
       await load();
     } catch (err) {
       fail(err);
@@ -49,10 +51,19 @@ export default function AdminPanel({ session, navigate, onLogout, onExpired }) {
   }
 
   async function newCode(u) {
-    if (!window.confirm(`Create a new access code for ${u.email}?\nTheir current code stops working and they will be signed out.`)) return;
+    const entered = window.prompt(
+      `Type a new access code for ${u.email} (at least 6 characters).\nTheir current code stops working and they will be signed out.`
+    );
+    if (entered === null) return; // cancelled
+    const newValue = entered.trim();
+    if (newValue.length < 6) {
+      setError('The access code must be at least 6 characters');
+      return;
+    }
     try {
-      const { code } = await regenerateCode(u.id);
-      setReveal({ email: u.email, code, kind: 'regenerated' });
+      await setUserCode(u.id, newValue);
+      setError('');
+      setReveal({ email: u.email, code: newValue, kind: 'changed' });
       setCopied(false);
       await load();
     } catch (err) {
@@ -112,7 +123,7 @@ export default function AdminPanel({ session, navigate, onLogout, onExpired }) {
             </div>
           </nav>
           <h1>Admin panel</h1>
-          <p>Add people and give them an access code. Only users you add here can open the logo page.</p>
+          <p>Add people and choose an access code for each. Only users you add here can open the logo page.</p>
         </div>
       </header>
 
@@ -128,14 +139,18 @@ export default function AdminPanel({ session, navigate, onLogout, onExpired }) {
               <span>Name <em>(optional)</em></span>
               <input type="text" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} placeholder="Jane Doe" />
             </label>
-            <button className="btn" type="submit" disabled={busy}>{busy ? 'Creating…' : 'Create user & code'}</button>
+            <label className="field">
+              <span>Access code <em>(you choose it, min 6 characters)</em></span>
+              <input type="text" required minLength={6} maxLength={64} autoComplete="off" value={code} onChange={(e) => setCode(e.target.value)} placeholder="e.g. Blueprint2026" />
+            </label>
+            <button className="btn" type="submit" disabled={busy}>{busy ? 'Adding…' : 'Add user'}</button>
           </form>
 
           {reveal && (
             <div className="reveal" role="status">
               <div>
-                <strong>{reveal.kind === 'created' ? 'User created.' : 'New code created.'}</strong>{' '}
-                Send this to <b>{reveal.email}</b>. For security it is shown only once.
+                <strong>{reveal.kind === 'created' ? 'User added.' : 'Access code changed.'}</strong>{' '}
+                Send <b>{reveal.email}</b> this code so they can sign in. It is shown here only until you click Done.
               </div>
               <div className="reveal-row">
                 <code className="reveal-code">{reveal.code}</code>
@@ -171,7 +186,7 @@ export default function AdminPanel({ session, navigate, onLogout, onExpired }) {
                       <td>{fmt(u.lastLoginAt)}</td>
                       <td>{fmt(u.createdAt)}</td>
                       <td className="actions">
-                        <button className="btn small ghost" onClick={() => newCode(u)}>New code</button>
+                        <button className="btn small ghost" onClick={() => newCode(u)}>Set new code</button>
                         <button className="btn small ghost" onClick={() => toggle(u)}>{u.active ? 'Disable' : 'Enable'}</button>
                         <button className="btn small danger" onClick={() => remove(u)}>Delete</button>
                       </td>

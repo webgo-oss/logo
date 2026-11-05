@@ -1,0 +1,22 @@
+# Render Blueprint: one web service that serves the API and the built React site.
+services:
+  - type: web
+    name: unstoppable-logos
+    runtime: node
+    plan: free
+    buildCommand: npm run render-build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI        # MongoDB Atlas connection string (you paste it in Render)
+        sync: false
+      - key: ADMIN_EMAIL      # admin login email
+        sync: false
+      - key: ADMIN_PASSWORD   # admin login password (min 8 characters)
+        sync: false
+      - key: SESSION_SECRET   # generated automatically by Render
+        generateValue: true
