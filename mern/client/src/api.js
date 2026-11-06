@@ -21,6 +21,7 @@ async function request(url, { method = 'GET', body } = {}) {
 }
 
 export const fetchSections = () => request('/api/logos/sections');
+export const fetchBackgrounds = () => request('/api/backgrounds/sections');
 
 // Auth
 export async function fetchMe() {

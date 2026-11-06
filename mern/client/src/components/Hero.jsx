@@ -9,11 +9,6 @@ export default function Hero({ navLogo, session, navigate, onLogout }) {
         <nav>
           {navLogo && <img src={navLogo.previewUrl} alt="Unstoppable" />}
           <div className="nav-right">
-            <div className="links">
-              <a href="#primary">Primary</a>
-              <a href="#secondary">Secondary</a>
-              <a href="#complementary">Complementary</a>
-            </div>
             <div className="account">
               <span className="who">{session.email}</span>
               {session.role === 'admin' && <a href="/admin" onClick={go('/admin')}>Admin panel</a>}

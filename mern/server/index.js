@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const app = require('./app');
 const ensureAdmin = require('./utils/ensureAdmin');
 const ensureLogos = require('./utils/ensureLogos');
+const ensureBackgrounds = require('./utils/ensureBackgrounds');
 
 const PORT = process.env.PORT || 5000; // Render sets PORT for you
 
@@ -16,6 +17,7 @@ mongoose
   .then(async () => {
     console.log('MongoDB connected');
     await ensureLogos();
+    await ensureBackgrounds();
     await ensureAdmin();
     app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
   })

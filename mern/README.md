@@ -102,6 +102,16 @@ Logo routes:
 - **complementary / secondary**: white, "Real Estate Growth Partner" (07, 08, 09)
 - **brand**: the gold monogram (10)
 
+## Solid backgrounds (USP Logo + Vertical)
+Two extra image sets, shown as sections 04 and 05 on the page and stored in their own `Background` collection:
+- **USP Logo** (landscape, 8000 × 4500): `server/public/backgrounds/landscape/`
+- **Vertical** (portrait, 2480 × 3508): `server/public/backgrounds/portrait/`
+- In both sets **01-09 are green = primary** and **10-18 are red = secondary** (edit `server/data/backgrounds.js` to change).
+- Each folder has `original/` (full-size JPG, download only) and `preview/` (small thumbnails shown on the page).
+- They are JPG only, so each card has a single JPG download button.
+- They load into MongoDB automatically on server start (`ensureBackgrounds`), or with `npm run seed`.
+- API: `GET /api/backgrounds/sections`, `GET /api/backgrounds/:set/:code/download` (`:set` is `landscape` or `portrait`).
+
 ## Where the images live
 - Preview images (shown on the page): `server/public/logos/preview/` (served to signed-in people at `/assets/logos/preview/logo-XX.png`)
 - Full-size PNG originals: `server/public/logos/original/`

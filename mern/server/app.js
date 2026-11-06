@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const express = require('express');
 const logoRoutes = require('./routes/logos');
+const backgroundRoutes = require('./routes/backgrounds');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const { requireAuth } = require('./middleware/auth');
@@ -22,9 +23,21 @@ app.use(
   })
 );
 
+// Background previews (landscape + portrait): signed-in people only; full-size files go through the download route.
+for (const set of ['landscape', 'portrait']) {
+  app.use(
+    `/assets/backgrounds/${set}/preview`,
+    requireAuth,
+    express.static(path.join(__dirname, 'public', 'backgrounds', set, 'preview'), {
+      setHeaders: (res) => res.setHeader('Cache-Control', 'private, max-age=86400'),
+    })
+  );
+}
+
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/logos', requireAuth, logoRoutes);
+app.use('/api/backgrounds', requireAuth, backgroundRoutes);
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
 // In production, serve the built React app (it contains no secrets; all data sits behind the API)
